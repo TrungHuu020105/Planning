@@ -4,6 +4,7 @@ from contextlib import closing
 from datetime import datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 from .models import PlannerState
 
@@ -11,6 +12,16 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DB_FILE = DATA_DIR / "planner.db"
 ADMIN_USERNAME = "Trunghuu"
 ADMIN_PASSWORD = "Trunghuu123"
+VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+
+
+def now_vn() -> datetime:
+    return datetime.now(VN_TZ)
+
+
+def now_vn_naive() -> datetime:
+    # Keep DB datetime values in local VN wall-clock format (without timezone suffix).
+    return now_vn().replace(tzinfo=None)
 
 
 def hash_password(password: str) -> str:
@@ -148,7 +159,7 @@ def _seed_user_data(conn: sqlite3.Connection, user_id: int) -> None:
     if row:
         return
 
-    start = _start_of_week(datetime.now())
+    start = _start_of_week(now_vn_naive())
     d = lambda offset: _fmt_date(start + timedelta(days=offset))
     iid = lambda: uuid4().hex[:8]
 
@@ -400,7 +411,7 @@ def save_state(user_id: int, state: PlannerState) -> None:
 
 
 def get_due_task_notifications(lead_minutes: int = 5) -> list[dict]:
-    now = datetime.now(VN_TZ).replace(second=0, microsecond=0)
+    now = now_vn_naive().replace(second=0, microsecond=0)
     target = now + timedelta(minutes=lead_minutes)
     target_date = target.strftime("%Y-%m-%d")
     target_time = target.strftime("%H:%M")
@@ -515,7 +526,7 @@ def delete_notification_settings(user_id: int) -> None:
 
 def create_reminder_jobs(user_id: int, lead_minutes: int = 5) -> int:
     with closing(_connect()) as conn:
-        now = datetime.now()
+        now = now_vn_naive()
         rows = conn.execute(
             """
             SELECT t.id, t.title, t.date, t.start, u.full_name

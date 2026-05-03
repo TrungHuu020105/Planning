@@ -2,9 +2,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
-from datetime import datetime
-
-from .store import get_pending_jobs, mark_job_sent
+from .store import get_pending_jobs, mark_job_sent, now_vn_naive
 
 
 def _send_telegram(bot_token: str, chat_id: str, message: str) -> None:
@@ -17,7 +15,7 @@ def _send_telegram(bot_token: str, chat_id: str, message: str) -> None:
 
 
 def _dispatch_due_jobs() -> None:
-    due = get_pending_jobs(datetime.now())
+    due = get_pending_jobs(now_vn_naive())
     for job in due:
         try:
             _send_telegram(job["telegram_token"], job["telegram_chat_id"], job["message"])

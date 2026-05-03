@@ -272,7 +272,7 @@ function Planner() {
                     setScanResult((e as Error).message || "Failed to save notification settings.");
                   }
                 }}
-                className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground"
+                className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/85 hover:-translate-y-0.5 active:translate-y-0"
               >
                 {hasSavedNotifyConfig ? "Save" : "Add"}
               </button>
@@ -289,7 +289,7 @@ function Planner() {
                     setScanResult((e as Error).message || "Scan failed.");
                   }
                 }}
-                className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white"
+                className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white transition-all duration-200 hover:bg-emerald-500 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Scan
               </button>
@@ -299,7 +299,7 @@ function Planner() {
                   await planner.deleteNotificationSettings();
                   setScanResult("Previous notification settings deleted.");
                 }}
-                className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white"
+                className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white transition-all duration-200 hover:bg-red-500 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Delete
               </button>
