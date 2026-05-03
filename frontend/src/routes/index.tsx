@@ -26,6 +26,7 @@ function Planner() {
   const [newPassword, setNewPassword] = useState("");
   const [adminNotice, setAdminNotice] = useState<{ type: "ok" | "error"; message: string } | null>(null);
   const [showNotifyPanel, setShowNotifyPanel] = useState(false);
+  const [showReminderPanel, setShowReminderPanel] = useState(false);
   const [showPasswordPanel, setShowPasswordPanel] = useState(false);
   const [notifyDraft, setNotifyDraft] = useState({
     enabled: false,
@@ -104,6 +105,16 @@ function Planner() {
   const weekStrs = weekDates(weekAnchor).map(fmtDate);
   const weekTasks = planner.state.tasks.filter((t) => weekStrs.includes(t.date));
   const totalDone = weekTasks.filter((t) => t.done).length;
+  const now = new Date();
+  const upcomingReminders = planner.state.tasks
+    .filter((t) => !t.done)
+    .map((t) => {
+      const at = new Date(`${t.date}T${t.start}:00`);
+      return { ...t, at };
+    })
+    .filter((t) => !Number.isNaN(t.at.getTime()) && t.at.getTime() >= now.getTime())
+    .sort((a, b) => a.at.getTime() - b.at.getTime())
+    .slice(0, 10);
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,6 +127,8 @@ function Planner() {
         onLogout={() => void planner.logout()}
         showNotifyButton={planner.me.role !== "admin"}
         onToggleNotify={() => setShowNotifyPanel((s) => !s)}
+        showReminderButton={planner.me.role !== "admin"}
+        onToggleReminder={() => setShowReminderPanel((s) => !s)}
         showChangePasswordButton={planner.me.role !== "admin"}
         onToggleChangePassword={() => setShowPasswordPanel((s) => !s)}
         totalDone={totalDone}
@@ -309,6 +322,37 @@ function Planner() {
               <div className="text-xs text-muted-foreground rounded-lg bg-muted/40 px-3 py-2">
                 Last scan: <b>{lastScanAt}</b> - Created <b>{lastScanCreated}</b> reminder job(s).
               </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {planner.me.role !== "admin" && showReminderPanel && (
+        <section className="mx-auto max-w-[1600px] px-4 lg:px-6 py-3">
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+            <h2 className="text-sm font-semibold">Upcoming reminders</h2>
+            {upcomingReminders.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No upcoming reminders.</p>
+            ) : (
+              <ul className="space-y-2">
+                {upcomingReminders.map((task) => {
+                  const diffMin = Math.max(
+                    0,
+                    Math.round((task.at.getTime() - now.getTime()) / 60000)
+                  );
+                  return (
+                    <li
+                      key={task.id}
+                      className="rounded-xl border border-border/70 bg-muted/30 px-3 py-2 text-xs"
+                    >
+                      <div className="font-medium text-foreground">{task.title}</div>
+                      <div className="text-muted-foreground">
+                        {task.at.toLocaleString()} - in {diffMin} minute(s)
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
           </div>
         </section>

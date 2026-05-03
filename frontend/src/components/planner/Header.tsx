@@ -10,6 +10,8 @@ interface Props {
   onLogout: () => void;
   showNotifyButton?: boolean;
   onToggleNotify?: () => void;
+  showReminderButton?: boolean;
+  onToggleReminder?: () => void;
   showChangePasswordButton?: boolean;
   onToggleChangePassword?: () => void;
   totalDone: number;
@@ -53,6 +55,14 @@ export function Header(p: Props) {
               className="px-3 py-1.5 text-xs font-medium rounded-lg bg-muted/60 hover:bg-accent transition"
             >
               Notifications
+            </button>
+          )}
+          {p.showReminderButton && (
+            <button
+              onClick={p.onToggleReminder}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-muted/60 hover:bg-accent transition"
+            >
+              Reminder
             </button>
           )}
           {p.showChangePasswordButton && (
