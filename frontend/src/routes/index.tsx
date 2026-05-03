@@ -19,6 +19,8 @@ function Planner() {
   const [fullName, setFullName] = useState("");
   const [newPasswords, setNewPasswords] = useState<Record<number, string>>({});
   const [scanResult, setScanResult] = useState<string>("");
+  const [lastScanAt, setLastScanAt] = useState<string>("");
+  const [lastScanCreated, setLastScanCreated] = useState<number | null>(null);
   const [passwordResult, setPasswordResult] = useState<string>("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -271,8 +273,15 @@ function Planner() {
               <button
                 onClick={async () => {
                   setScanResult("");
-                  const created = await planner.scanNotifications();
-                  setScanResult(`Scan complete. Created ${created} reminder job(s).`);
+                  try {
+                    const created = await planner.scanNotifications();
+                    const scannedAt = new Date().toLocaleString();
+                    setLastScanCreated(created);
+                    setLastScanAt(scannedAt);
+                    setScanResult(`Scan complete. Created ${created} reminder job(s).`);
+                  } catch (e) {
+                    setScanResult((e as Error).message || "Scan failed.");
+                  }
                 }}
                 className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white"
               >
@@ -290,6 +299,11 @@ function Planner() {
               </button>
             </div>
             {scanResult && <p className="text-xs text-muted-foreground">{scanResult}</p>}
+            {lastScanCreated !== null && lastScanAt && (
+              <div className="text-xs text-muted-foreground rounded-lg bg-muted/40 px-3 py-2">
+                Last scan: <b>{lastScanAt}</b> - Created <b>{lastScanCreated}</b> reminder job(s).
+              </div>
+            )}
           </div>
         </section>
       )}
