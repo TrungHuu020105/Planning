@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Goal, Habit, PlannerState, Task } from "@/lib/planner-types";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8001";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const TOKEN_KEY = "planner-token";
 
 export interface AuthUser {
