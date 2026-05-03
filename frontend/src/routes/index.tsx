@@ -258,18 +258,24 @@ function Planner() {
               </div>
             )}
             <div className="flex gap-2">
-              {!hasSavedNotifyConfig && (
-                <button
-                  onClick={async () => {
-                    setScanResult("");
+              <button
+                onClick={async () => {
+                  setScanResult("");
+                  try {
                     await planner.saveNotificationSettings(notifyDraft);
-                    setScanResult("Notification settings saved.");
-                  }}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground"
-                >
-                  Add
-                </button>
-              )}
+                    setScanResult(
+                      hasSavedNotifyConfig
+                        ? "Notification settings updated."
+                        : "Notification settings saved."
+                    );
+                  } catch (e) {
+                    setScanResult((e as Error).message || "Failed to save notification settings.");
+                  }
+                }}
+                className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground"
+              >
+                {hasSavedNotifyConfig ? "Save" : "Add"}
+              </button>
               <button
                 onClick={async () => {
                   setScanResult("");
