@@ -18,10 +18,10 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
-Backend mac dinh: `http://localhost:8000`
+Backend mac dinh: `http://localhost:8001`
 
 ### 2) Chay frontend
 
@@ -36,7 +36,22 @@ Frontend mac dinh: `http://localhost:5173`
 Neu can doi API URL, tao file `frontend/.env`:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8001
+```
+
+### 3) Chay bang Docker (frontend port 2005)
+
+```bash
+docker compose up --build
+```
+
+- Frontend: `http://localhost:2005`
+- Backend API: `http://localhost:8001`
+
+Dung:
+
+```bash
+docker compose down
 ```
 
 ## Tai khoan va phan quyen
